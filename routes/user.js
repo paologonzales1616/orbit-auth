@@ -67,11 +67,16 @@ router.post("/register", USER_REGISTER, (req, res) => {
   const token = req.headers.authorization.split(" ")[1];
 
   if (!verifyToken(token)) {
-    res.status(400).jsonp({ status: "fail", message: "Token Invalid" });
+    res.status(401).jsonp({ status: "fail", message: "Token Invalid" });
     return;
   }
 
-  const { id } = decodeToken(token);
+  const { id, admin } = decodeToken(token);
+
+  if(!admin){
+    res.status(400).jsonp({ status: "error", message: "Unauthorize access" });
+    return;
+  }
 
   const { name, username, password } = req.body;
 
