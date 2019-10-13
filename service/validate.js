@@ -42,12 +42,6 @@ const ADMIN_REGISTER = [
 ];
 
 const USER_REGISTER = [
-  check("admin_email")
-    .isEmail()
-    .withMessage("Must be valid email address.")
-    .not()
-    .isEmpty()
-    .withMessage("Email must not be empty."),
   check("name")
     .not()
     .isEmpty()

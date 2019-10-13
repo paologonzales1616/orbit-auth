@@ -21,7 +21,12 @@ function verifyToken(token) {
   }
 }
 
+function decodeToken(token) {
+  return jwt.verify(token, publicKEY);
+}
+
 module.exports = {
   generateSignedToken,
-  verifyToken
+  verifyToken,
+  decodeToken
 };

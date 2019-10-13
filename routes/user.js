@@ -1,11 +1,18 @@
 const router = require("express").Router();
+const mongoose = require("mongoose");
 const { validationResult } = require("express-validator");
 
 const { generateHash, validatePassword } = require("../service/password");
-const { generateSignedToken } = require("../service/jwt");
+const {
+  generateSignedToken,
+  verifyToken,
+  decodeToken
+} = require("../service/jwt");
 const { USER_REGISTER, USER_LOGIN } = require("../service/validate");
 
-router.post("/auth", USER_LOGIN, (req, res) => {
+const User = require("../model/user");
+
+router.post("/", USER_LOGIN, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     res.status(400).jsonp({ status: "fail", message: errors.array() });
@@ -31,7 +38,7 @@ router.post("/auth", USER_LOGIN, (req, res) => {
       status: "success",
       data: {
         token: generateSignedToken({
-          admin_email: user.admin_email,
+          id: user._id.toString(),
           name: user.name,
           username: user.username,
           admin: false
@@ -43,7 +50,7 @@ router.post("/auth", USER_LOGIN, (req, res) => {
 });
 
 //user register
-router.post("/auth/register", USER_REGISTER, (req, res) => {
+router.post("/register", USER_REGISTER, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     res.status(400).jsonp({ status: "fail", message: errors.array() });
@@ -64,7 +71,9 @@ router.post("/auth/register", USER_REGISTER, (req, res) => {
     return;
   }
 
-  const { admin_email, name, username, password } = req.body;
+  const { id } = decodeToken(token);
+
+  const { name, username, password } = req.body;
 
   User.findOne({ username: username }).exec((err, user) => {
     if (user != null) {
@@ -80,7 +89,7 @@ router.post("/auth/register", USER_REGISTER, (req, res) => {
     }
 
     const newUser = new User();
-    newUser.admin_email = admin_email;
+    newUser.admin_id = mongoose.Types.ObjectId(id);
     newUser.name = name;
     newUser.username = username;
     newUser.password = generateHash(password);
