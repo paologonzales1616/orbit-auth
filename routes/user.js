@@ -34,11 +34,13 @@ router.post("/", USER_LOGIN, (req, res) => {
       res.status(400).jsonp({ status: "fail", message: "Password Invalid." });
       return;
     }
+    console.log(user.admin_id.toString());
     res.status(200).jsonp({
       status: "success",
       data: {
         token: generateSignedToken({
           id: user._id.toString(),
+          admin_id: user.admin_id.toString(),
           name: user.name,
           username: user.username,
           admin: false
@@ -67,14 +69,14 @@ router.post("/register", USER_REGISTER, (req, res) => {
   const token = req.headers.authorization.split(" ")[1];
 
   if (!verifyToken(token)) {
-    res.status(401).jsonp({ status: "fail", message: "Token Invalid" });
+    res.status(400).jsonp({ status: "fail", message: "Invalid Token" });
     return;
   }
 
   const { id, admin } = decodeToken(token);
 
-  if(!admin){
-    res.status(400).jsonp({ status: "error", message: "Unauthorize access" });
+  if (!admin) {
+    res.status(401).jsonp({ status: "error", message: "Unauthorize access" });
     return;
   }
 

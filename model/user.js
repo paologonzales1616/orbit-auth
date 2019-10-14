@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-//define then schema for admin model
+// Define schema for admin model
 const userSchema = mongoose.Schema({
   admin_id: mongoose.Schema.Types.ObjectId,
   name: String,
